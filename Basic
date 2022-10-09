@@ -1,0 +1,63 @@
+TITLE: This is the bifactor exploratory factor analysis
+
+DATA:
+    FILE IS "LHTLSOnly.csv";		! remember to use the proper drive, back-slash, and data file; all commands end in ;
+                    			! here, the data format is fixed file, with each item occupying a column
+
+VARIABLE:
+    NAMES ARE v1-v19;
+    USEVARIABLES ARE v1-v19;		! you are requesting the program to use Items 1 to 21
+
+ANALYSIS:
+    TYPE = EFA 4 4;			! here, the "fg" plus the 3 dimension-specific factors are listed
+    ESTIMATOR = MLR;		! here, you are asking for a robust estimator because data is non-normal
+    ROTATION = BI-GEOMIN (oblique);	! here, you specify the orthogonal bi-factor rotation
+    PARALLEL=50;			! here, you are asking for parallel analysis (PA)
+
+OUTPUT: sampstat;
+
+PLOT: TYPE = PLOT3;		! here, you ask to get both the eigenvalue & PA plot
+
+! Second Step
+
+TITLE: This is the bifactor exploratory factor analysis
+
+DATA:
+    FILE IS "FullClean.csv";	
+                    			
+VARIABLE:
+    NAMES ARE SEX PLS1-PLS8 FICQ1-FICQ10 RCOM1-RCOM15 STLS1-STLS45 
+    LTLS1-LTLS19 PLS FICQ RCOM SPass SInt SCom SAll;
+    USEVARIABLES ARE LTLS1-LTLS19 PLS FICQ RCOM;	
+
+ANALYSIS:
+    Estimator = MLR;
+    Iterations = 1000; 
+
+Model: 
+    Passion by LTLS1-LTLS6;
+    Intimacy by LTLS7-LTLS13;
+    Comm by LTLS14-LTLS19;
+
+    SL by Passion Intimacy Comm;
+
+    Passion@1;
+    Intimacy@1;
+    Comm@1;
+
+    SL with Passion@0 intimacy@0 Comm@0;
+    Passion with intimacy@0 Comm@0;
+    Intimacy with comm@0;
+
+    PLS on SL Passion Intimacy Comm; 
+    RCOM on SL Comm Passion Intimacy;
+    FICQ on SL Intimacy Comm Passion;
+
+    PLS with RCOM@0 FICQ@0;
+    RCOM with FICQ@0;
+
+
+OUTPUT: sampstat;
+
+
+
